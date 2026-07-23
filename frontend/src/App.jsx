@@ -2,9 +2,79 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const API_BASE = 'http://localhost:8001';
 
+// Detailed SVG Icon assets for a premium feel
+const Icons = {
+  robot: (
+    <svg className="logo-icon-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2V5M12 5C8.13401 5 5 8.13401 5 12C5 13.9033 5.76214 15.629 7 16.9002V20C7 21.1046 7.89543 22 9 22H15C16.1046 22 17 21.1046 17 20V16.9002C18.2379 15.629 19 13.9033 19 12C19 8.13401 15.866 5 12 5Z" stroke="url(#logo-grad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 12H9.01M15 12H15.01" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M10 16C10.5 16.5 11.2 16.8 12 16.8C12.8 16.8 13.5 16.5 14 16" stroke="url(#logo-grad)" strokeWidth="2" strokeLinecap="round"/>
+      <defs>
+        <linearGradient id="logo-grad" x1="5" y1="5" x2="19" y2="22" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3b82f6" />
+          <stop offset="1" stopColor="#06b6d4" />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
+  chat: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  ),
+  dashboard: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="9"></rect>
+      <rect x="14" y="3" width="7" height="5"></rect>
+      <rect x="14" y="12" width="7" height="9"></rect>
+      <rect x="3" y="16" width="7" height="5"></rect>
+    </svg>
+  ),
+  database: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+      <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+    </svg>
+  ),
+  user: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  ),
+  send: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"></line>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+    </svg>
+  ),
+  reset: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+    </svg>
+  ),
+  trendUp: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+      <polyline points="17 6 23 6 23 12"></polyline>
+    </svg>
+  ),
+  scenario: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+  ),
+  checkmark: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  )
+};
+
 function App() {
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'planner' | 'explorer'
-  const [rightTab, setRightTab] = useState('flow'); // 'flow' | 'logs' | 'api'
+  const [activeTab, setActiveTab] = useState('chat');
+  const [rightTab, setRightTab] = useState('flow');
   const [userEmail, setUserEmail] = useState('dave.miller@fieldtech.com');
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([
@@ -22,7 +92,6 @@ function App() {
   const [sessionState, setSessionState] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Db tables data
   const [inventory, setInventory] = useState([]);
   const [requisitions, setRequisitions] = useState([]);
   const [parts, setParts] = useState([]);
@@ -36,19 +105,16 @@ function App() {
     product_families: {}
   });
 
-  // Planner Modals
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedReq, setSelectedReq] = useState(null);
   const [selectedSourceSite, setSelectedSourceSite] = useState('');
 
   const chatEndRef = useRef(null);
 
-  // Scroll chat to bottom on new message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load data from backend on mount and tab switch
   const loadData = async () => {
     try {
       const invRes = await fetch(`${API_BASE}/api/inventory`);
@@ -73,38 +139,35 @@ function App() {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 5000); // Poll updates every 5s
+    const interval = setInterval(loadData, 5000);
     return () => clearInterval(interval);
   }, [activeTab]);
 
-  // Triggered when user selects a user dropdown option
   const handleUserChange = (e) => {
     setUserEmail(e.target.value);
     setMessages([
       {
         sender: 'bot',
-        text: `Switched user profile to **${e.target.value}**. Requisition warehouse connection configured. What parts do you need?`,
+        text: `Switched session to profile: **${e.target.value}**. Requisition warehouse routing set. How can I assist you today?`,
         step: 1
       }
     ]);
     setSessionState({});
     setCurrentStep(1);
-    setExecutionLogs([`Session restarted for user ${e.target.value}`]);
+    setExecutionLogs([`Session configured for user: ${e.target.value}`]);
     setApiCalls([]);
   };
 
-  // Main chat submit handler
   const handleSend = async (textToSend) => {
     const text = textToSend || inputText;
     if (!text.trim() || isProcessing) return;
 
     if (!textToSend) setInputText('');
 
-    // Append user message
     setMessages(prev => [...prev, { sender: 'user', text }]);
     setIsProcessing(true);
     setCurrentStep(1);
-    setExecutionLogs(['Connecting to server...', 'Validating user authentication...']);
+    setExecutionLogs(['Initializing Replenisher core state...', 'Resolving technician profile...']);
 
     try {
       const response = await fetch(`${API_BASE}/api/chat`, {
@@ -120,7 +183,6 @@ function App() {
 
       const data = await response.json();
 
-      // Animate execution timeline steps for high-fidelity digital worker simulation
       let stepTimer = 1;
       const targetStep = data.step || 6;
       
@@ -129,7 +191,6 @@ function App() {
           stepTimer += 1;
           setCurrentStep(stepTimer);
           
-          // Slice execution logs and API calls to simulate real-time progress
           const progressLogs = data.execution_logs.slice(0, Math.ceil((data.execution_logs.length / targetStep) * stepTimer));
           setExecutionLogs(progressLogs);
 
@@ -137,13 +198,11 @@ function App() {
           setApiCalls(progressAPIs);
         } else {
           clearInterval(interval);
-          // Set final values
           setCurrentStep(targetStep);
           setExecutionLogs(data.execution_logs);
           setApiCalls(data.simulated_api_calls);
           setSessionState(data.session_state || {});
           
-          // Append Bot Response
           setMessages(prev => [...prev, { 
             sender: 'bot', 
             text: data.response,
@@ -152,29 +211,20 @@ function App() {
             active_candidates: data.session_state?.active_candidates || null
           }]);
           setIsProcessing(false);
-          loadData(); // reload stats
+          loadData();
         }
-      }, 500);
+      }, 400);
 
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Error connecting to the Replenisher Agent backend. Make sure the backend server is running.' }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: 'Error communicating with AI digital worker. Please verify the Python backend is running.' }]);
       setIsProcessing(false);
     }
   };
 
   const handleScenarioSelect = (scenario) => {
     if (isProcessing) return;
-    
-    // Auto configure user email depending on scenario for realistic demonstration
-    if (scenario.id === 'clarify' || scenario.id === 'history') {
-      setUserEmail('dave.miller@fieldtech.com');
-    } else if (scenario.id === 'out_of_stock') {
-      setUserEmail('dave.miller@fieldtech.com');
-    } else {
-      setUserEmail('dave.miller@fieldtech.com');
-    }
-    
+    setUserEmail('dave.miller@fieldtech.com');
     setInputText(scenario.query);
     setSessionState({});
   };
@@ -206,7 +256,6 @@ function App() {
 
   const handleOpenResolveModal = (req) => {
     setSelectedReq(req);
-    // Find options where stock exists
     const itemInventory = inventory.filter(inv => inv.part_number === req.part_number && inv.qty_on_hand > 0);
     if (itemInventory.length > 0) {
       setSelectedSourceSite(itemInventory[0].site_id);
@@ -240,19 +289,19 @@ function App() {
   };
 
   const handleResetDb = async () => {
-    if (!confirm("Are you sure you want to reset the database? This clears all requisitions and restores initial seeded stock.")) return;
+    if (!confirm("Are you sure you want to reset the database? This restores stock and removes old records.")) return;
     try {
       await fetch(`${API_BASE}/api/reset`, { method: 'POST' });
       setMessages([
         {
           sender: 'bot',
-          text: 'Database successfully reset to initial seed values! Let\'s start a new material replenishment scenario.',
+          text: 'Database reset completed. Mock tables populated with seed data. What parts do you need?',
           step: 1
         }
       ]);
       setSessionState({});
       setCurrentStep(1);
-      setExecutionLogs(['Database reset. Replenisher Worker ready.']);
+      setExecutionLogs(['Database reset completed. Replenisher Worker online.']);
       setApiCalls([]);
       loadData();
     } catch (err) {
@@ -264,25 +313,25 @@ function App() {
     {
       id: 'lookup',
       title: '1. Instant Part Lookup',
-      desc: 'Requests standard drive belt. Demonstrates zero back-office lookup speed.',
+      desc: 'Retrieves stock level and creates a direct approved MMR from inventory.',
       query: 'I need 2 drive belts for work order WO-1024'
     },
     {
       id: 'clarify',
       title: '2. Intelligent Clarification',
-      desc: 'Ambiguous request. Prompts technician to select standard or heavy duty.',
+      desc: 'Demonstrates ambiguity handling when multiple candidate parts match description.',
       query: 'Need a drive belt for unit AHU-500'
     },
     {
       id: 'history',
       title: '3. Historical Intelligence',
-      desc: 'Retrieves parts historically replaced on unit. Suggests correct parts.',
+      desc: 'Leverages historical records to suggest parts previously used on an AHU unit.',
       query: 'Show me what parts were previously used on functional unit AHU-500-EAST'
     },
     {
       id: 'out_of_stock',
-      title: '4. Planner Stockout Exception',
-      desc: 'Out of stock at local site. Shows connected site stock and routes to planner.',
+      title: '4. Planner Exception Routing',
+      desc: 'Fires an exception when parts are unavailable locally, routing to planner.',
       query: 'Request 1 Solenoid Valve for WO-9943'
     }
   ];
@@ -292,15 +341,16 @@ function App() {
       {/* Header */}
       <header className="header">
         <div className="logo-section">
-          <div className="logo-icon">R</div>
+          {Icons.robot}
           <div>
             <h1 className="logo-text">Smart Replenisher</h1>
           </div>
-          <span className="logo-badge">AGENT.v1</span>
+          <span className="logo-badge">AGENT WORKER</span>
         </div>
 
         <div className="header-controls">
           <div className="role-selector">
+            {Icons.user}
             <label>Technician Profile:</label>
             <select className="role-select" value={userEmail} onChange={handleUserChange}>
               <option value="dave.miller@fieldtech.com">Dave Miller (SITE-EAST)</option>
@@ -310,44 +360,53 @@ function App() {
 
           <div className="api-status">
             <div className="status-dot"></div>
-            <span>System Active</span>
+            <span>Agent Active</span>
           </div>
 
-          <button className="reset-btn" onClick={handleResetDb}>Reset DB</button>
+          <button className="reset-btn" onClick={handleResetDb}>
+            {Icons.reset}
+            Reset Database
+          </button>
         </div>
       </header>
 
-      {/* Tabs */}
+      {/* Navigation */}
       <nav className="tabs-bar">
         <button 
           className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
           onClick={() => setActiveTab('chat')}
         >
-          Technician Chat Portal
+          {Icons.chat}
+          Technician Agent Console
         </button>
         <button 
           className={`tab-btn ${activeTab === 'planner' ? 'active' : ''}`}
           onClick={() => setActiveTab('planner')}
         >
-          Planner MMR Dashboard
+          {Icons.dashboard}
+          Planner Exception Control
         </button>
         <button 
           className={`tab-btn ${activeTab === 'explorer' ? 'active' : ''}`}
           onClick={() => setActiveTab('explorer')}
         >
-          Mock Database Explorer
+          {Icons.database}
+          Database Registry
         </button>
       </nav>
 
-      {/* Core Workspace */}
+      {/* Main Grid */}
       {activeTab === 'chat' && (
         <div className="dashboard-grid">
           
-          {/* Left panel: Scenarios */}
+          {/* Left Sidebar */}
           <aside className="sidebar-left">
-            <h3 className="panel-title">Demo Scenarios</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-              Click any scenario to pre-populate the input box, then press Enter to execute.
+            <h3 className="panel-title">
+              {Icons.scenario}
+              Scenarios Select
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+              Select a predefined technician scenario to pre-populate the input bar.
             </p>
             <div className="scenarios-list">
               {scenarios.map(sc => (
@@ -363,28 +422,28 @@ function App() {
             </div>
           </aside>
 
-          {/* Center panel: Chat */}
+          {/* Center Chat View */}
           <main className="chat-panel">
             <div className="chat-history">
               {messages.map((m, idx) => (
                 <div key={idx} className={`message-bubble ${m.sender}`}>
                   <div className={`avatar ${m.sender === 'user' ? 'user-av' : 'bot-av'}`}>
-                    {m.sender === 'user' ? 'T' : 'AI'}
+                    {m.sender === 'user' ? Icons.user : Icons.robot}
                   </div>
                   <div className="message-content">
                     <p style={{ whiteSpace: 'pre-wrap' }}>{m.text}</p>
                     
                     {/* Render candidate part selectors */}
                     {m.active_candidates && (
-                      <div className="actions-row" style={{ flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.8rem' }}>
+                      <div className="actions-row" style={{ flexWrap: 'wrap', gap: '0.5rem', marginTop: '1rem' }}>
                         {m.active_candidates.map((c, cIdx) => (
                           <button 
                             key={cIdx} 
                             className="btn-cancel" 
-                            style={{ borderColor: 'var(--accent-blue)', color: '#fff', fontSize: '0.8rem' }}
+                            style={{ borderColor: 'var(--accent-blue)', color: '#fff', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                             onClick={() => handleCandidateSelect(c)}
                           >
-                            {c.description} ({c.part_number})
+                            <span>➔</span> {c.description} ({c.part_number})
                           </button>
                         ))}
                       </div>
@@ -394,31 +453,32 @@ function App() {
                     {m.pending_order && (
                       <div className="requisition-card">
                         <div className="req-field">
-                          <span className="req-label">Part Number:</span>
+                          <span className="req-label">Part Selected</span>
                           <span className="req-value">{m.pending_order.part_number}</span>
                         </div>
                         <div className="req-field">
-                          <span className="req-label">Description:</span>
+                          <span className="req-label">Specification</span>
                           <span className="req-value">{m.pending_order.description}</span>
                         </div>
                         <div className="req-field">
-                          <span className="req-label">Quantity:</span>
-                          <span className="req-value">{m.pending_order.quantity}</span>
+                          <span className="req-label">Quantity</span>
+                          <span className="req-value">{m.pending_order.quantity} units</span>
                         </div>
                         <div className="req-field">
-                          <span className="req-label">Fulfillment Site:</span>
+                          <span className="req-label">Target Site</span>
                           <span className="req-value">{m.pending_order.site_id}</span>
                         </div>
                         <div className="req-field">
-                          <span className="req-label">Work Order:</span>
+                          <span className="req-label">Assigned Work Order</span>
                           <span className="req-value">{m.pending_order.work_order_id}</span>
                         </div>
                         <div className="actions-row">
                           <button className="btn-confirm" onClick={() => handleConfirmOrder(true)}>
+                            {Icons.checkmark}
                             Yes, Confirm Order
                           </button>
                           <button className="btn-cancel" onClick={() => handleConfirmOrder(false)}>
-                            Cancel
+                            Cancel Requisition
                           </button>
                         </div>
                       </div>
@@ -428,9 +488,10 @@ function App() {
               ))}
               {isProcessing && (
                 <div className="message-bubble assistant">
-                  <div className="avatar bot-av">AI</div>
-                  <div className="message-content" style={{ color: 'var(--accent-cyan)', fontStyle: 'italic' }}>
-                    Replenisher worker analyzing request...
+                  <div className="avatar bot-av">{Icons.robot}</div>
+                  <div className="message-content" style={{ color: 'var(--accent-cyan)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div className="status-dot" style={{ margin: 0 }}></div>
+                    AI Replenisher is executing agentic steps...
                   </div>
                 </div>
               )}
@@ -441,7 +502,7 @@ function App() {
               <input 
                 type="text" 
                 className="chat-input"
-                placeholder="Ask Replenisher for parts, check availability or view history..."
+                placeholder="Check stock or request parts (e.g. 'I need 2 drive belts for WO-1024')..."
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
@@ -452,31 +513,32 @@ function App() {
                 onClick={() => handleSend()}
                 disabled={isProcessing}
               >
-                Send
+                {Icons.send}
+                Execute Request
               </button>
             </div>
           </main>
 
-          {/* Right panel: Digital Worker Plan Flow & Debugger */}
+          {/* Right Pipeline Stepper / Logs Panel */}
           <aside className="sidebar-right">
             <div className="tab-selector-small">
               <button 
                 className={`tab-btn-sm ${rightTab === 'flow' ? 'active' : ''}`}
                 onClick={() => setRightTab('flow')}
               >
-                Plan Flow
+                Pipeline Monitor
               </button>
               <button 
                 className={`tab-btn-sm ${rightTab === 'logs' ? 'active' : ''}`}
                 onClick={() => setRightTab('logs')}
               >
-                Execution Logs
+                Terminal Trace
               </button>
               <button 
                 className={`tab-btn-sm ${rightTab === 'api' ? 'active' : ''}`}
                 onClick={() => setRightTab('api')}
               >
-                Developer API Logs
+                API Payloads
               </button>
             </div>
 
@@ -484,77 +546,85 @@ function App() {
               {rightTab === 'flow' && (
                 <div className="plan-flow">
                   <div className={`flow-step ${currentStep === 1 ? 'active' : currentStep > 1 ? 'completed' : ''}`}>
-                    <div className="flow-node">1</div>
+                    <div className="flow-node">{currentStep > 1 ? Icons.checkmark : '01'}</div>
                     <div className="flow-info">
                       <h5>User Identification</h5>
-                      <p>Resolve email details to retrieve technician ID and warehouse mappings.</p>
+                      <p>Resolves technician profile and default site mappings from SQL.</p>
                     </div>
                   </div>
 
                   <div className={`flow-step ${currentStep === 2 ? 'active' : currentStep > 2 ? 'completed' : ''}`}>
-                    <div className="flow-node">2</div>
+                    <div className="flow-node">{currentStep > 2 ? Icons.checkmark : '02'}</div>
                     <div className="flow-info">
-                      <h5>NLU Intent Parsing</h5>
-                      <p>Analyze query using Gemini NLP to extract intent, description, and quantity.</p>
+                      <h5>Gemini Intent Parsing</h5>
+                      <p>Extracts entity tags (part description, target unit, quantities) from query.</p>
                     </div>
                   </div>
 
                   <div className={`flow-step ${currentStep === 3 ? 'active' : currentStep > 3 ? 'completed' : ''}`}>
-                    <div className="flow-node">3</div>
+                    <div className="flow-node">{currentStep > 3 ? Icons.checkmark : '03'}</div>
                     <div className="flow-info">
-                      <h5>Catalog Lookup</h5>
-                      <p>Search standard parts listings and compatible unit specs.</p>
+                      <h5>Intelligent Catalog Lookup</h5>
+                      <p>Searches matching items by code description, unit, or repair history.</p>
                     </div>
                   </div>
 
                   <div className={`flow-step ${currentStep === 4 ? 'active' : currentStep > 4 ? 'completed' : ''}`}>
-                    <div className="flow-node">4</div>
+                    <div className="flow-node">{currentStep > 4 ? Icons.checkmark : '04'}</div>
                     <div className="flow-info">
                       <h5>Ambiguity Check</h5>
-                      <p>Verify matches and request clarification if multiple items are found.</p>
+                      <p>Resolves specification candidate details or asks target questions.</p>
                     </div>
                   </div>
 
                   <div className={`flow-step ${currentStep === 5 ? 'active' : currentStep > 5 ? 'completed' : ''}`}>
-                    <div className="flow-node">5</div>
+                    <div className="flow-node">{currentStep > 5 ? Icons.checkmark : '05'}</div>
                     <div className="flow-info">
-                      <h5>Inventory Inspection</h5>
-                      <p>Query stock quantities at local warehouses vs. global locations.</p>
+                      <h5>Inventory Check</h5>
+                      <p>Queries bin counts in technician default warehouses.</p>
                     </div>
                   </div>
 
                   <div className={`flow-step ${currentStep === 6 ? 'active' : currentStep > 6 ? 'completed' : ''}`}>
-                    <div className="flow-node">6</div>
+                    <div className="flow-node">{currentStep > 6 ? Icons.checkmark : '06'}</div>
                     <div className="flow-info">
                       <h5>MMR Creation</h5>
-                      <p>Generate maintenance requisitions and notify inventory planners.</p>
+                      <p>Creates database material records and updates stocks.</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {rightTab === 'logs' && (
-                <div className="exec-logs">
-                  {executionLogs.map((log, lIdx) => {
-                    let logType = '';
-                    if (log.includes('ERROR:')) logType = 'error';
-                    else if (log.includes('WARNING:')) logType = 'warning';
-                    else if (log.includes('SUCCESS:')) logType = 'success';
-                    return (
-                      <div key={lIdx} className={`exec-log-line ${logType}`}>
-                        {log}
-                      </div>
-                    );
-                  })}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                    <span>std_trace_logs.log</span>
+                    <span>115kb</span>
+                  </div>
+                  <div className="exec-logs">
+                    {executionLogs.map((log, lIdx) => {
+                      let logType = '';
+                      if (log.includes('ERROR:')) logType = 'error';
+                      else if (log.includes('WARNING:')) logType = 'warning';
+                      else if (log.includes('SUCCESS:')) logType = 'success';
+                      return (
+                        <div key={lIdx} className={`exec-log-line ${logType}`}>
+                          {log}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
               {rightTab === 'api' && (
                 <div className="debug-list">
                   {apiCalls.length === 0 ? (
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '2rem' }}>
-                      No simulated API requests logged yet. Submit a query to track payloads.
-                    </p>
+                    <div style={{ padding: '3rem 1rem', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: '12px' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        Console clean. Run a scenario to track JSON payloads in real-time.
+                      </p>
+                    </div>
                   ) : (
                     apiCalls.map((call, cIdx) => (
                       <div key={cIdx} className="debug-card">
@@ -563,15 +633,15 @@ function App() {
                           <span>{call.timestamp}</span>
                         </div>
                         <div className="debug-content">
-                          <div className="debug-path">{call.path}</div>
+                          <div className="debug-path"><strong>Request Endpoint:</strong> {call.path}</div>
                           {call.request && (
-                            <div style={{ marginBottom: '0.4rem' }}>
-                              <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Request payload:</p>
+                            <div style={{ marginBottom: '0.6rem' }}>
+                              <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>Payload Body (JSON):</p>
                               <pre className="debug-json">{JSON.stringify(call.request, null, 2)}</pre>
                             </div>
                           )}
                           <div>
-                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Response body:</p>
+                            <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>Response (JSON):</p>
                             <pre className="debug-json">{JSON.stringify(call.response, null, 2)}</pre>
                           </div>
                         </div>
@@ -589,46 +659,51 @@ function App() {
       {activeTab === 'planner' && (
         <div className="single-view">
           <div className="planner-container">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Planner Management Control</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-              Monitor incoming Maintenance Material Requisitions (MMRs) and manage stockout exceptions routed from field technicians.
-            </p>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '0.4rem' }}>Planner Requisition Hub</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                Review active requisitions, verify auto-approved cycles, and resolve stockout exceptions generated by technician natural language prompts.
+              </p>
+            </div>
 
             {/* Stats Cards */}
             <div className="stats-grid">
               <div className="stat-card">
                 <span className="stat-header">Total Requisitions</span>
                 <span className="stat-value">{stats.total_requisitions}</span>
-                <span className="stat-desc">Created via conversational agents</span>
+                <span className="stat-desc">Conversational requisitions</span>
               </div>
               <div className="stat-card">
-                <span className="stat-header">Success Rate</span>
-                <span className="stat-value" style={{ color: stats.success_rate > 80 ? 'var(--accent-green)' : 'var(--accent-orange)' }}>
-                  {stats.success_rate}%
-                </span>
-                <span className="stat-desc">Auto-fulfillment rate</span>
+                <span className="stat-header">Auto-Fulfillment Rate</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span className="stat-value" style={{ color: stats.success_rate > 80 ? 'var(--accent-green)' : 'var(--accent-orange)' }}>
+                    {stats.success_rate}%
+                  </span>
+                  {stats.success_rate >= 80 && Icons.trendUp}
+                </div>
+                <span className="stat-desc">Approved instantly without delays</span>
               </div>
               <div className="stat-card" style={{ borderLeft: '3px solid var(--accent-red)' }}>
-                <span className="stat-header">Stockout Exceptions</span>
-                <span className="stat-value" style={{ color: stats.exception_count > 0 ? 'var(--accent-red)' : 'var(--text-primary)' }}>
+                <span className="stat-header">Pending Stock Exceptions</span>
+                <span className="stat-value" style={{ color: stats.exception_count > 0 ? 'var(--accent-red)' : '#fff' }}>
                   {stats.exception_count}
                 </span>
-                <span className="stat-desc">Awaiting inventory resolution</span>
+                <span className="stat-desc">Requires manual transfer approval</span>
               </div>
               <div className="stat-card">
-                <span className="stat-header">Hours Saved</span>
-                <span className="stat-value" style={{ color: 'var(--accent-cyan)' }}>{stats.estimated_hours_saved}h</span>
-                <span className="stat-desc">Est. technician time saved</span>
+                <span className="stat-header">Field Hours Saved</span>
+                <span className="stat-value" style={{ color: 'var(--accent-cyan)' }}>{stats.estimated_hours_saved} hrs</span>
+                <span className="stat-desc">Avg. 18m saved per order</span>
               </div>
             </div>
 
             {/* Requisitions Table */}
-            <div className="table-card" style={{ marginTop: '1.5rem' }}>
+            <div className="table-card">
               <div className="table-header-row">
-                <h3>Active Requisitions</h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  Polled in real-time
-                </span>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span className="status-dot"></span>
+                  Active Requisitions Database
+                </h3>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table className="custom-table">
@@ -636,41 +711,41 @@ function App() {
                     <tr>
                       <th>MMR ID</th>
                       <th>Work Order</th>
-                      <th>Part Number</th>
-                      <th>Description</th>
+                      <th>Part ID</th>
+                      <th>Part Description</th>
                       <th>Qty</th>
-                      <th>Warehouse Site</th>
+                      <th>Technician Warehouse</th>
                       <th>Requested By</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>Status Badge</th>
+                      <th style={{ textAlign: 'right' }}>Management Options</th>
                     </tr>
                   </thead>
                   <tbody>
                     {requisitions.length === 0 ? (
                       <tr>
-                        <td colSpan="9" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
-                          No requisitions created.
+                        <td colSpan="9" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3.5rem 2rem' }}>
+                          No MMR requests logged in the database yet.
                         </td>
                       </tr>
                     ) : (
                       requisitions.map((r) => (
                         <tr key={r.id}>
-                          <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 'bold' }}>MMR-{r.id}</td>
+                          <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: 'var(--accent-blue)' }}>MMR-{r.id}</td>
                           <td style={{ fontFamily: 'var(--font-mono)' }}>{r.work_order_id}</td>
                           <td style={{ fontFamily: 'var(--font-mono)' }}>{r.part_number}</td>
-                          <td>{r.description}</td>
+                          <td><strong>{r.description}</strong></td>
                           <td>{r.qty_requested}</td>
                           <td>{r.site_id}</td>
-                          <td>{r.creator_name} ({r.created_by})</td>
+                          <td>{r.creator_name} <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>({r.created_by})</span></td>
                           <td>
                             <span className={`status-badge ${r.status.toLowerCase()}`}>
                               {r.status}
                             </span>
                           </td>
-                          <td>
+                          <td style={{ textAlign: 'right' }}>
                             {r.status === 'Pending' && (
                               <button className="action-btn-sm" onClick={() => handleApproveReq(r.id)}>
-                                Approve & Issue
+                                Approve & Deduct
                               </button>
                             )}
                             {r.status === 'Exception' && (
@@ -679,7 +754,7 @@ function App() {
                               </button>
                             )}
                             {r.status === 'Approved' && (
-                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fulfilled</span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: '600' }}>✓ Handed to Tech</span>
                             )}
                           </td>
                         </tr>
@@ -697,75 +772,81 @@ function App() {
       {activeTab === 'explorer' && (
         <div className="single-view">
           <div className="planner-container">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Database Table Explorer</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-              Inspect live contents of SQL database tables mapped inside the mock ERP system.
-            </p>
-
-            {/* Inventory Database View */}
-            <div className="table-card">
-              <div className="table-header-row">
-                <h3>Warehouse Inventory Levels (`inventory` table)</h3>
-              </div>
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Part Number</th>
-                    <th>Description</th>
-                    <th>Warehouse Site</th>
-                    <th>Bin Location</th>
-                    <th>Qty On Hand</th>
-                    <th>Qty Reserved</th>
-                    <th>Net Available</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.map((inv) => (
-                    <tr key={inv.id}>
-                      <td style={{ fontFamily: 'var(--font-mono)' }}>{inv.part_number}</td>
-                      <td>{inv.description}</td>
-                      <td>{inv.site_id}</td>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>{inv.warehouse_location}</td>
-                      <td style={{ fontWeight: 'bold' }}>{inv.qty_on_hand}</td>
-                      <td>{inv.qty_reserved}</td>
-                      <td style={{ color: (inv.qty_on_hand - inv.qty_reserved) > 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-                        {inv.qty_on_hand - inv.qty_reserved}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '0.4rem' }}>SQL Database Registry</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                Query the persistent SQLite schema directly. View current quantities on hand, reserved slots, and equipment compatibility mappings.
+              </p>
             </div>
 
-            {/* Parts Catalog Database View */}
-            <div className="table-card" style={{ marginTop: '2rem' }}>
+            {/* Inventory Table */}
+            <div className="table-card">
               <div className="table-header-row">
-                <h3>Parts Catalog Registry (`parts` table)</h3>
+                <h3>Stock Bin Allocations (`inventory` table)</h3>
               </div>
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Part Number</th>
-                    <th>Description</th>
-                    <th>Unit Type Target</th>
-                    <th>Product Family</th>
-                    <th>Compatible Units</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {parts.map((p) => (
-                    <tr key={p.part_number}>
-                      <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 'bold' }}>{p.part_number}</td>
-                      <td>{p.description}</td>
-                      <td>{p.unit_type}</td>
-                      <td>{p.product_family}</td>
-                      <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        {p.compatible_units ? JSON.parse(p.compatible_units).join(', ') : 'All'}
-                      </td>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Part Number</th>
+                      <th>Description</th>
+                      <th>Site ID</th>
+                      <th>Bin Location (Aisle-Shelf)</th>
+                      <th>Qty On Hand</th>
+                      <th>Qty Reserved</th>
+                      <th>Net Qty Available</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {inventory.map((inv) => (
+                      <tr key={inv.id}>
+                        <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>{inv.part_number}</td>
+                        <td><strong>{inv.description}</strong></td>
+                        <td>{inv.site_id}</td>
+                        <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{inv.warehouse_location}</td>
+                        <td style={{ fontWeight: 'bold' }}>{inv.qty_on_hand}</td>
+                        <td>{inv.qty_reserved}</td>
+                        <td style={{ fontWeight: 'bold', color: (inv.qty_on_hand - inv.qty_reserved) > 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+                          {inv.qty_on_hand - inv.qty_reserved}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Parts Table */}
+            <div className="table-card">
+              <div className="table-header-row">
+                <h3>Catalog Registry (`parts` table)</h3>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Part Registry ID</th>
+                      <th>Description Name</th>
+                      <th>Unit Class compatibility</th>
+                      <th>Product family category</th>
+                      <th>Compatible hardware models</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parts.map((p) => (
+                      <tr key={p.part_number}>
+                        <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 'bold', color: 'var(--accent-cyan)' }}>{p.part_number}</td>
+                        <td><strong>{p.description}</strong></td>
+                        <td style={{ fontFamily: 'var(--font-mono)' }}>{p.unit_type}</td>
+                        <td>{p.product_family}</td>
+                        <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          {p.compatible_units ? JSON.parse(p.compatible_units).join(', ') : 'All'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
           </div>
@@ -776,25 +857,29 @@ function App() {
       {showResolveModal && selectedReq && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Resolve Stockout Exception: MMR-{selectedReq.id}</h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              Technician **{selectedReq.creator_name}** requested **{selectedReq.qty_requested}x {selectedReq.description}** at **{selectedReq.site_id}**. 
-              However, the local site is currently out of stock.
+            <h3 style={{ color: 'var(--accent-red)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>⚠️</span> Exception Transfer: MMR-{selectedReq.id}
+            </h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Technician **{selectedReq.creator_name}** needs **{selectedReq.qty_requested}x {selectedReq.description}** at **{selectedReq.site_id}** but stock is **0**.
+              Select an alternative warehouse with stock to execute a transfer and fulfill the requisition.
             </p>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Transfer stock from alternative warehouse:
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                Select Source Warehouse Site:
               </label>
               
               <select 
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '6px',
+                  background: '#04060b',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '8px',
                   color: 'white',
-                  padding: '0.6rem',
-                  fontFamily: 'var(--font-sans)'
+                  padding: '0.75rem',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.9rem',
+                  outline: 'none'
                 }}
                 value={selectedSourceSite}
                 onChange={e => setSelectedSourceSite(e.target.value)}
@@ -803,17 +888,17 @@ function App() {
                   .filter(inv => inv.part_number === selectedReq.part_number && inv.site_id !== selectedReq.site_id)
                   .map(inv => (
                     <option key={inv.site_id} value={inv.site_id}>
-                      {inv.site_id} ({inv.qty_on_hand} available in stock)
+                      {inv.site_id} ({inv.qty_on_hand} units in stock)
                     </option>
                   ))
                 }
                 {inventory.filter(inv => inv.part_number === selectedReq.part_number && inv.site_id !== selectedReq.site_id).length === 0 && (
-                  <option value="">No alternative sites have stock</option>
+                  <option value="">No other sites have stock available</option>
                 )}
               </select>
             </div>
 
-            <div className="actions-row" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+            <div className="actions-row" style={{ justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
               <button className="btn-cancel" onClick={() => setShowResolveModal(false)}>
                 Cancel
               </button>
@@ -823,7 +908,8 @@ function App() {
                 onClick={handleResolveReqSubmit}
                 disabled={!selectedSourceSite}
               >
-                Resolve & Approve Transfer
+                {Icons.checkmark}
+                Approve Transfer & Issue MMR
               </button>
             </div>
           </div>
