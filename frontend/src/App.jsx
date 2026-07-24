@@ -408,7 +408,7 @@ function App() {
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
               Select a predefined technician scenario to pre-populate the input bar.
             </p>
-            <div className="scenarios-list">
+            <div className="scenarios-list" style={{ marginBottom: '1.5rem' }}>
               {scenarios.map(sc => (
                 <div 
                   key={sc.id} 
@@ -419,6 +419,68 @@ function App() {
                   <p>{sc.desc}</p>
                 </div>
               ))}
+            </div>
+
+            <h3 className="panel-title">
+              {Icons.database}
+              My Requisitions
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4', marginBottom: '0.75rem' }}>
+              Requisition requests submitted by this technician account.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: '280px', overflowY: 'auto', paddingRight: '0.2rem' }}>
+              {requisitions
+                .filter(r => {
+                  const techEmailMap = {
+                    'dave.miller@fieldtech.com': 'TECH-001',
+                    'sarah.jenkins@fieldtech.com': 'TECH-002'
+                  };
+                  return r.created_by === techEmailMap[userEmail];
+                })
+                .map(r => (
+                  <div key={r.id} style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '10px',
+                    padding: '0.75rem',
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.3rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: '700', color: 'var(--accent-blue)', fontFamily: 'var(--font-mono)' }}>MMR-{r.id}</span>
+                      <span className={`status-badge ${r.status.toLowerCase()}`} style={{ fontSize: '0.6rem', padding: '0.15rem 0.4rem', border: 'none' }}>
+                        {r.status}
+                      </span>
+                    </div>
+                    <div style={{ color: '#fff', fontWeight: '600' }}>
+                      {r.description} <span style={{ color: 'var(--text-secondary)' }}>(x{r.qty_requested})</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontFamily: 'var(--font-mono)' }}>
+                      WO: {r.work_order_id} | Site: {r.site_id}
+                    </div>
+                  </div>
+                ))
+              }
+              {requisitions.filter(r => {
+                const techEmailMap = {
+                  'dave.miller@fieldtech.com': 'TECH-001',
+                  'sarah.jenkins@fieldtech.com': 'TECH-002'
+                };
+                return r.created_by === techEmailMap[userEmail];
+              }).length === 0 && (
+                <div style={{
+                  textAlign: 'center',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.75rem',
+                  padding: '1.5rem 1rem',
+                  border: '1px dashed var(--border-color)',
+                  borderRadius: '10px'
+                }}>
+                  No requisitions created yet.
+                </div>
+              )}
             </div>
           </aside>
 
