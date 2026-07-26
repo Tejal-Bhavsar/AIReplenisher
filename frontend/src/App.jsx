@@ -108,6 +108,7 @@ function App() {
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedReq, setSelectedReq] = useState(null);
   const [selectedSourceSite, setSelectedSourceSite] = useState('');
+  const [plannerFilter, setPlannerFilter] = useState('ALL');
 
   const chatEndRef = useRef(null);
 
@@ -224,7 +225,6 @@ function App() {
 
   const handleScenarioSelect = (scenario) => {
     if (isProcessing) return;
-    setUserEmail('dave.miller@fieldtech.com');
     setInputText(scenario.query);
     setSessionState({});
   };
@@ -309,30 +309,55 @@ function App() {
     }
   };
 
-  const scenarios = [
+  const scenarios = userEmail === 'dave.miller@fieldtech.com' ? [
     {
       id: 'lookup',
-      title: '1. Instant Part Lookup',
-      desc: 'Retrieves stock level and creates a direct approved MMR from inventory.',
+      title: '1. Instant Part Lookup (East)',
+      desc: 'Retrieves stock level and creates a direct approved MMR for Dave Miller at SITE-EAST.',
       query: 'I need 2 drive belts for work order WO-1024'
     },
     {
       id: 'clarify',
       title: '2. Intelligent Clarification',
-      desc: 'Demonstrates ambiguity handling when multiple candidate parts match description.',
+      desc: 'Demonstrates ambiguity handling when Dave requests a belt for unit AHU-500.',
       query: 'Need a drive belt for unit AHU-500'
     },
     {
       id: 'history',
       title: '3. Historical Intelligence',
-      desc: 'Leverages historical records to suggest parts previously used on an AHU unit.',
+      desc: 'Leverages historical records to suggest parts previously used on AHU-500-EAST.',
       query: 'Show me what parts were previously used on functional unit AHU-500-EAST'
     },
     {
       id: 'out_of_stock',
       title: '4. Planner Exception Routing',
-      desc: 'Fires an exception when parts are unavailable locally, routing to planner.',
+      desc: 'Dave requests a Solenoid Valve (out of stock at SITE-EAST, available at SITE-NORTH).',
       query: 'Request 1 Solenoid Valve for WO-9943'
+    }
+  ] : [
+    {
+      id: 'lookup',
+      title: '1. Instant Part Lookup (North)',
+      desc: 'Retrieves stock level and creates a direct approved MMR for Sarah Jenkins at SITE-NORTH.',
+      query: 'I need 1 Solenoid Valve for work order WO-2045'
+    },
+    {
+      id: 'clarify',
+      title: '2. Intelligent Clarification',
+      desc: 'Demonstrates ambiguity handling when Sarah requests a belt for unit AHU-500.',
+      query: 'Need a drive belt for unit AHU-500'
+    },
+    {
+      id: 'history',
+      title: '3. Historical Intelligence',
+      desc: 'Leverages historical records to suggest parts previously used on CHL-900-NORTH.',
+      query: 'Show me what parts were previously used on functional unit CHL-900-NORTH'
+    },
+    {
+      id: 'out_of_stock',
+      title: '4. Planner Exception Routing',
+      desc: 'Sarah requests a HEPA filter (out of stock at SITE-NORTH, available at SITE-EAST).',
+      query: 'Request 2 HEPA filters for WO-3021'
     }
   ];
 
@@ -761,11 +786,36 @@ function App() {
 
             {/* Requisitions Table */}
             <div className="table-card">
-              <div className="table-header-row">
+              <div className="table-header-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span className="status-dot"></span>
                   Active Requisitions Database
                 </h3>
+                
+                {/* Technician Profile Filter Pills */}
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <button 
+                    className={`tab-btn-sm ${plannerFilter === 'ALL' ? 'active' : ''}`}
+                    style={{ flex: 'none', padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.7rem' }}
+                    onClick={() => setPlannerFilter('ALL')}
+                  >
+                    All Requisitions
+                  </button>
+                  <button 
+                    className={`tab-btn-sm ${plannerFilter === 'TECH-001' ? 'active' : ''}`}
+                    style={{ flex: 'none', padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.7rem' }}
+                    onClick={() => setPlannerFilter('TECH-001')}
+                  >
+                    Dave Miller (East)
+                  </button>
+                  <button 
+                    className={`tab-btn-sm ${plannerFilter === 'TECH-002' ? 'active' : ''}`}
+                    style={{ flex: 'none', padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.7rem' }}
+                    onClick={() => setPlannerFilter('TECH-002')}
+                  >
+                    Sarah Jenkins (North)
+                  </button>
+                </div>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table className="custom-table">
@@ -783,14 +833,16 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {requisitions.length === 0 ? (
+                    {requisitions.filter(r => plannerFilter === 'ALL' || r.created_by === plannerFilter).length === 0 ? (
                       <tr>
                         <td colSpan="9" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3.5rem 2rem' }}>
-                          No MMR requests logged in the database yet.
+                          No matching requisitions found.
                         </td>
                       </tr>
                     ) : (
-                      requisitions.map((r) => (
+                      requisitions
+                        .filter(r => plannerFilter === 'ALL' || r.created_by === plannerFilter)
+                        .map((r) => (
                         <tr key={r.id}>
                           <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: 'var(--accent-blue)' }}>MMR-{r.id}</td>
                           <td style={{ fontFamily: 'var(--font-mono)' }}>{r.work_order_id}</td>

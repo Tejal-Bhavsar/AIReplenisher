@@ -100,7 +100,8 @@ def seed_database(db):
     historical = [
         HistoricalTask(work_order_id="WO-8812", functional_unit_id="AHU-500-EAST", part_number="FILT-AIR-99", qty_used=2, date="2026-03-12"),
         HistoricalTask(work_order_id="WO-9943", functional_unit_id="CHL-900-NORTH", part_number="VALV-SOL-12", qty_used=1, date="2026-04-15"),
-        HistoricalTask(work_order_id="WO-1024", functional_unit_id="AHU-500-EAST", part_number="BELT-DRV-08", qty_used=1, date="2026-05-18")
+        HistoricalTask(work_order_id="WO-1024", functional_unit_id="AHU-500-EAST", part_number="BELT-DRV-08", qty_used=1, date="2026-05-18"),
+        HistoricalTask(work_order_id="WO-2045", functional_unit_id="CHL-900-NORTH", part_number="FILT-HEPA-02", qty_used=1, date="2026-06-20")
     ]
     for h in historical:
         db.add(h)
