@@ -815,6 +815,13 @@ body {
   word-break: break-all;
 }
 
+.single-view {
+  flex: 1;
+  overflow: auto;
+  padding: 2.5rem;
+  min-width: 0;
+}
+
 /* Planner Dashboard Tab View */
 .planner-container {
   display: flex;
