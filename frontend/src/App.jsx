@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const API_BASE = 'http://localhost:8001';
+const API_BASE = 'https://backend-beta-plum-33.vercel.app';
 
 // Detailed SVG Icon assets for a premium feel
 const Icons = {
