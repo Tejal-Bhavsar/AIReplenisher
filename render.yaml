@@ -9,4 +9,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.12
       - key: GEMINI_API_KEY
-        placeholder: "Enter your Gemini API Key (e.g. AIzaSy...)"
+        sync: false
